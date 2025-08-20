@@ -236,6 +236,7 @@ class DrawingBoard {
     const textElement = document.createElement("div")
     textElement.className = "text-element"
     textElement.contentEditable = true
+    textElement.spellcheck = false
     textElement.textContent = "Texto"
     textElement.style.left = x + "px"
     textElement.style.top = y + "px"
