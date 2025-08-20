@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizarra de Dibujo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Canvas principal para dibujo -->
+    <canvas id="drawingCanvas"></canvas>
+    
+    <!-- Capa para elementos HTML (texto, imágenes) -->
+    <div id="elementsLayer"></div>
+    
+    <!-- Botón para mostrar/ocultar toolbar -->
+    <button id="toggleToolbar" class="toggle-btn">⋯</button>
+    
+    <!-- Barra de herramientas flotante -->
+    <div id="toolbar" class="toolbar">
+        <button id="pencilTool" class="tool-btn active" data-tool="pencil" title="Lápiz">✏️</button>
+        <button id="eraserTool" class="tool-btn" data-tool="eraser" title="Borrador">🧽</button>
+        
+        <div class="tool-group">
+            <label for="colorPicker" class="tool-btn" title="Color">🎨</label>
+            <input type="color" id="colorPicker" value="#ffffff">
+        </div>
+        
+        <div class="tool-group size-control">
+            <label class="tool-label">📏</label>
+            <input type="range" id="sizeSlider" min="1" max="50" value="5">
+            <input type="number" id="sizeInput" min="1" max="50" value="5">
+        </div>
+        
+        <button id="textTool" class="tool-btn" data-tool="text" title="Texto">📝</button>
+        
+        <div class="tool-group">
+            <label for="imageInput" class="tool-btn" title="Imagen">🖼️</label>
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+        </div>
+        
+        <button id="clearCanvas" class="tool-btn" title="Limpiar Canvas">🧹</button>
+        <button id="resetAll" class="tool-btn" title="Reset Todo">🗑️</button>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

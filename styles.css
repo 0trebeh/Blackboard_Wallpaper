@@ -1,0 +1,250 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  user-select: none;
+}
+
+#drawingCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: crosshair;
+  z-index: 1;
+  width: 100vw;
+  height: 100vh;
+}
+
+#elementsLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.toggle-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  font-size: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.toolbar {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 15px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: calc(100vw - 120px);
+  transition: all 0.3s ease;
+  z-index: 999;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.toolbar.hidden {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+}
+
+.tool-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  font-size: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tool-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.tool-btn.active {
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.tool-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.tool-label {
+  color: white;
+  font-size: 16px;
+}
+
+#colorPicker {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.size-control {
+  flex-direction: column;
+  gap: 4px;
+}
+
+#sizeSlider {
+  width: 80px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+#sizeInput {
+  width: 50px;
+  height: 25px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: white;
+  text-align: center;
+  font-size: 12px;
+}
+
+/* Elementos de texto */
+.text-element {
+  position: absolute;
+  color: white;
+  font-size: 16px;
+  font-family: inherit;
+  background: transparent;
+  border: none;
+  outline: none;
+  pointer-events: auto;
+  cursor: text;
+  min-width: 20px;
+  min-height: 20px;
+  z-index: 10;
+}
+
+.text-element:focus {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+}
+
+/* Elementos de imagen */
+.image-element {
+  position: absolute;
+  pointer-events: auto;
+  cursor: move;
+  z-index: 10;
+}
+
+/* Elementos seleccionados */
+.selected {
+  outline: 2px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 2px;
+}
+
+/* Asas de redimensionado */
+.resize-handle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: white;
+  border: 1px solid #333;
+  border-radius: 50%;
+  cursor: nw-resize;
+  z-index: 20;
+}
+
+.resize-handle.se {
+  bottom: -4px;
+  right: -4px;
+  cursor: se-resize;
+}
+
+.resize-handle.sw {
+  bottom: -4px;
+  left: -4px;
+  cursor: sw-resize;
+}
+
+.resize-handle.ne {
+  top: -4px;
+  right: -4px;
+  cursor: ne-resize;
+}
+
+.resize-handle.nw {
+  top: -4px;
+  left: -4px;
+  cursor: nw-resize;
+}
+
+/* Estados de cursor */
+.drawing {
+  cursor: crosshair !important;
+}
+.erasing {
+  cursor: grab !important;
+}
+.text-mode {
+  cursor: text !important;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.text-element,
+.image-element {
+  animation: fadeIn 0.2s ease;
+}
