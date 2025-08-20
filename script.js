@@ -254,32 +254,42 @@ class DrawingBoard {
   }
 
   // Agregar imagen
-  addImage(e) {
-    const file = e.target.files[0]
-    if (!file) return
+addImage(e) {
+  const file = e.target.files[0]
+  if (!file) return
 
-    const reader = new FileReader()
-    reader.onload = (event) => {
-      const img = document.createElement("img")
-      img.src = event.target.result
-      img.className = "image-element"
-      img.style.left = "50px"
-      img.style.top = "50px"
-      img.style.maxWidth = "300px"
-      img.style.height = "auto"
-      img.style.position = "absolute"
-      img.style.minWidth = "50px"
-      img.style.minHeight = "50px"
+  const reader = new FileReader()
+  reader.onload = (event) => {
+    // Contenedor
+    const wrapper = document.createElement("div")
+    wrapper.className = "image-element"
+    wrapper.style.left = "50px"
+    wrapper.style.top = "50px"
+    wrapper.style.width = "200px"
+    wrapper.style.height = "auto"
+    wrapper.style.position = "absolute"
+    wrapper.style.minWidth = "50px"
+    wrapper.style.minHeight = "50px"
 
-      this.elementsLayer.appendChild(img)
-      this.makeElementInteractive(img)
-      this.selectElement(img)
-    }
-    reader.readAsDataURL(file)
+    // Imagen dentro del contenedor
+    const img = document.createElement("img")
+    img.src = event.target.result
+    img.style.width = "100%"
+    img.style.height = "100%"
+    img.style.display = "block"
 
-    // Reset input
-    e.target.value = ""
+    wrapper.appendChild(img)
+    this.elementsLayer.appendChild(wrapper)
+
+    this.makeElementInteractive(wrapper)
+    this.selectElement(wrapper)
   }
+  reader.readAsDataURL(file)
+
+  // Reset input
+  e.target.value = ""
+}
+
 
   // Hacer elemento interactivo
   makeElementInteractive(element) {
