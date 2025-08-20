@@ -1,5 +1,6 @@
 class DrawingBoard {
   constructor() {
+    this.keyboard = document.getElementById("onScreenKeyboard")
     this.canvas = document.getElementById("drawingCanvas")
     this.ctx = this.canvas.getContext("2d")
     this.elementsLayer = document.getElementById("elementsLayer")
@@ -65,20 +66,30 @@ class DrawingBoard {
       btn.addEventListener("click", (e) => this.setTool(e.target.dataset.tool))
     })
 
-    // Control events
-    document.getElementById("colorPicker").addEventListener("change", this.setColor.bind(this))
-    document.getElementById("sizeSlider").addEventListener("input", this.setSize.bind(this))
-    document.getElementById("sizeInput").addEventListener("input", this.setSize.bind(this))
-    document.getElementById("clearCanvas").addEventListener("click", this.clearCanvas.bind(this))
-    document.getElementById("resetAll").addEventListener("click", this.resetAll.bind(this))
-    document.getElementById("imageInput").addEventListener("change", this.addImage.bind(this))
-    document.getElementById("toggleToolbar").addEventListener("click", this.toggleToolbar.bind(this))
+    // Control events (verifica que existan los elementos en tu HTML)
+    const colorPicker = document.getElementById("colorPicker")
+    const sizeSlider = document.getElementById("sizeSlider")
+    const sizeInput = document.getElementById("sizeInput")
+    const clearBtn = document.getElementById("clearCanvas")
+    const resetBtn = document.getElementById("resetAll")
+    const imageInput = document.getElementById("imageInput")
+    const toggleToolbarBtn = document.getElementById("toggleToolbar")
+
+    if (colorPicker) colorPicker.addEventListener("change", this.setColor.bind(this))
+    if (sizeSlider) sizeSlider.addEventListener("input", this.setSize.bind(this))
+    if (sizeInput) sizeInput.addEventListener("input", this.setSize.bind(this))
+    if (clearBtn) clearBtn.addEventListener("click", this.clearCanvas.bind(this))
+    if (resetBtn) resetBtn.addEventListener("click", this.resetAll.bind(this))
+    if (imageInput) imageInput.addEventListener("change", this.addImage.bind(this))
+    if (toggleToolbarBtn) toggleToolbarBtn.addEventListener("click", this.toggleToolbar.bind(this))
   }
 
   // Inicializar toolbar draggable
   initToolbar() {
     let isDragging = false
     const dragOffset = { x: 0, y: 0 }
+
+    if (!this.toolbar) return
 
     this.toolbar.addEventListener("mousedown", (e) => {
       if (e.target === this.toolbar || e.target.classList.contains("tool-label")) {
@@ -102,7 +113,7 @@ class DrawingBoard {
 
     document.addEventListener("mouseup", () => {
       isDragging = false
-      this.toolbar.style.cursor = ""
+      if (this.toolbar) this.toolbar.style.cursor = ""
     })
   }
 
@@ -138,6 +149,11 @@ class DrawingBoard {
 
   // Manejar click en documento
   handleDocumentClick(e) {
+    //  FIX: Evitar deseleccionar si se hace click en el teclado en pantalla
+    if (e.target.closest(".keyboard")) {
+      return
+    }
+
     if (!e.target.closest(".text-element") && !e.target.closest(".image-element")) {
       this.deselectElement()
     }
@@ -159,7 +175,8 @@ class DrawingBoard {
     document.querySelectorAll(".tool-btn[data-tool]").forEach((btn) => {
       btn.classList.remove("active")
     })
-    document.querySelector(`[data-tool="${tool}"]`).classList.add("active")
+    const btn = document.querySelector(`[data-tool="${tool}"]`)
+    if (btn) btn.classList.add("active")
 
     // Actualizar cursor
     this.updateCursor()
@@ -178,6 +195,9 @@ class DrawingBoard {
         break
       case "text":
         this.canvas.classList.add("text-mode")
+        break
+      case "none":
+        this.canvas.style.cursor = "default"
         break
     }
   }
@@ -221,13 +241,15 @@ class DrawingBoard {
 
     // Sincronizar slider y input
     if (e.target.id === "sizeSlider") {
-      document.getElementById("sizeInput").value = this.currentSize
+      const sizeInput = document.getElementById("sizeInput")
+      if (sizeInput) sizeInput.value = this.currentSize
     } else {
-      document.getElementById("sizeSlider").value = this.currentSize
+      const sizeSlider = document.getElementById("sizeSlider")
+      if (sizeSlider) sizeSlider.value = this.currentSize
     }
   }
 
-  // Agregar texto
+  // Agregar texto (cuando se usa la herramienta text)
   addText(e) {
     const rect = this.canvas.getBoundingClientRect()
     const x = e.clientX - rect.left
@@ -237,7 +259,7 @@ class DrawingBoard {
     textElement.className = "text-element"
     textElement.contentEditable = true
     textElement.spellcheck = false
-    textElement.textContent = "Texto"
+    textElement.textContent = ""
     textElement.style.left = x + "px"
     textElement.style.top = y + "px"
     textElement.style.color = this.currentColor
@@ -255,50 +277,70 @@ class DrawingBoard {
   }
 
   // Agregar imagen
-addImage(e) {
-  const file = e.target.files[0]
-  if (!file) return
+  addImage(e) {
+    const file = e.target.files[0]
+    if (!file) return
 
-  const reader = new FileReader()
-  reader.onload = (event) => {
-    // Contenedor
-    const wrapper = document.createElement("div")
-    wrapper.className = "image-element"
-    wrapper.style.left = "50px"
-    wrapper.style.top = "50px"
-    wrapper.style.width = "200px"
-    wrapper.style.height = "auto"
-    wrapper.style.position = "absolute"
-    wrapper.style.minWidth = "50px"
-    wrapper.style.minHeight = "50px"
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      // Contenedor
+      const wrapper = document.createElement("div")
+      wrapper.className = "image-element"
+      wrapper.style.left = "50px"
+      wrapper.style.top = "50px"
+      wrapper.style.width = "200px"
+      wrapper.style.height = "auto"
+      wrapper.style.position = "absolute"
+      wrapper.style.minWidth = "50px"
+      wrapper.style.minHeight = "50px"
 
-    // Imagen dentro del contenedor
-    const img = document.createElement("img")
-    img.src = event.target.result
-    img.style.width = "100%"
-    img.style.height = "100%"
-    img.style.display = "block"
+      // Imagen dentro del contenedor
+      const img = document.createElement("img")
+      img.src = event.target.result
+      img.style.width = "100%"
+      img.style.height = "100%"
+      img.style.display = "block"
 
-    wrapper.appendChild(img)
-    this.elementsLayer.appendChild(wrapper)
+      wrapper.appendChild(img)
+      this.elementsLayer.appendChild(wrapper)
 
-    this.makeElementInteractive(wrapper)
-    this.selectElement(wrapper)
+      this.makeElementInteractive(wrapper)
+      this.selectElement(wrapper)
+    }
+    reader.readAsDataURL(file)
+
+    // Reset input
+    e.target.value = ""
   }
-  reader.readAsDataURL(file)
-
-  // Reset input
-  e.target.value = ""
-}
-
 
   // Hacer elemento interactivo
   makeElementInteractive(element) {
     element.addEventListener("mousedown", (e) => {
+      //  No procesar si se hace click en un resize handle
+      if (e.target.classList.contains("resize-handle")) {
+        return
+      }
+
       e.stopPropagation()
       this.selectElement(element)
+
+      //  Sincronizar con focusedEditable para el teclado
+      if (element.classList.contains("text-element") && window.__keyboardFocusedEditable !== undefined) {
+        window.__keyboardFocusedEditable = element
+      }
+
       this.startDrag(e, element)
     })
+
+    //  Manejar focus en elementos de texto
+    if (element.classList.contains("text-element")) {
+      element.addEventListener("focus", () => {
+        this.selectElement(element)
+        if (window.__keyboardFocusedEditable !== undefined) {
+          window.__keyboardFocusedEditable = element
+        }
+      })
+    }
   }
 
   // Seleccionar elemento
@@ -306,16 +348,57 @@ addImage(e) {
     this.deselectElement()
     this.selectedElement = element
     element.classList.add("selected")
-    this.addResizeHandles(element)
+
+    //  Agregar asas de redimensionado para elementos seleccionados
+    if (element.classList.contains("text-element") || element.classList.contains("image-element")) {
+      this.addResizeHandles(element)
+    }
+
+    // 👉 Mostrar teclado si es un text-element
+    if (element.classList.contains("text-element")) {
+      this.keyboard.classList.remove("hidden")
+      this.keyboard.style.display = "flex" // Cambiar a flex para mejor compatibilidad
+    }
   }
 
   // Deseleccionar elemento
   deselectElement() {
     if (this.selectedElement) {
-      this.selectedElement.classList.remove("selected")
+      //  Remover asas de redimensionado antes de deseleccionar
       this.removeResizeHandles(this.selectedElement)
+      this.selectedElement.classList.remove("selected")
       this.selectedElement = null
     }
+    // 👉 Ocultar teclado
+    this.keyboard.classList.add("hidden")
+    this.keyboard.style.display = "none"
+    //  Limpiar también el focusedEditable del teclado
+    if (window.__keyboardFocusedEditable !== undefined) {
+      window.__keyboardFocusedEditable = null
+    }
+  }
+
+  // Método para cerrar el teclado manualmente
+  closeKeyboardManually() {
+    this.keyboard.classList.add("hidden")
+    this.keyboard.style.display = "none"
+    //  Al cerrar manualmente, también deseleccionar el elemento
+    if (this.selectedElement) {
+      //  Remover asas antes de deseleccionar
+      this.removeResizeHandles(this.selectedElement)
+      this.selectedElement.classList.remove("selected")
+      this.selectedElement = null
+    }
+    //  Limpiar también el focusedEditable del teclado
+    if (window.__keyboardFocusedEditable !== undefined) {
+      window.__keyboardFocusedEditable = null
+    }
+  }
+
+  // Método para mostrar el teclado (no necesita resetear flag)
+  showKeyboard() {
+    this.keyboard.classList.remove("hidden")
+    this.keyboard.style.display = "flex"
   }
 
   // Agregar asas de redimensionado
@@ -408,17 +491,21 @@ addImage(e) {
             break
         }
 
-        if (element.tagName === "IMG") {
-          const aspectRatio = startWidth / startHeight
-          if (position === "se" || position === "nw") {
-            newHeight = newWidth / aspectRatio
-          } else if (position === "sw" || position === "ne") {
-            newHeight = newWidth / aspectRatio
-            if (position === "ne") {
-              newTop = startTop + startHeight - newHeight
-            }
-            if (position === "sw") {
-              newLeft = startLeft + startWidth - newWidth
+        //  Manejar proporción para imágenes
+        if (element.classList.contains("image-element")) {
+          const img = element.querySelector("img")
+          if (img) {
+            const aspectRatio = startWidth / startHeight
+            if (position === "se" || position === "nw") {
+              newHeight = newWidth / aspectRatio
+            } else if (position === "sw" || position === "ne") {
+              newHeight = newWidth / aspectRatio
+              if (position === "ne") {
+                newTop = startTop + startHeight - newHeight
+              }
+              if (position === "sw") {
+                newLeft = startLeft + startWidth - newWidth
+              }
             }
           }
         }
@@ -461,23 +548,49 @@ addImage(e) {
 
   // Limpiar canvas
   clearCanvas() {
-    if (confirm("Confirmar Limpieza")) {
+    this.showConfirm(() => {
       this.ctx.fillStyle = "#000000"
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
+    })
+  }
+
+  showConfirm(onOk) {
+    const modal = document.getElementById("confirmModal")
+    if (!modal) {
+      // fallback si no existe modal
+      if (confirm && typeof confirm === "function") {
+        if (confirm("¿Borrar todo?")) onOk()
+      }
+      return
     }
+    modal.classList.remove("hidden")
+
+    const okBtn = document.getElementById("confirmOk")
+    const cancelBtn = document.getElementById("confirmCancel")
+
+    const close = () => modal.classList.add("hidden")
+
+    okBtn.onclick = () => { close(); onOk() }
+    cancelBtn.onclick = close
   }
 
   // Reset todo
   resetAll() {
-    if (confirm("Confirmar Reset")) {
-      this.clearCanvas()
-      this.elementsLayer.innerHTML = ""
-      this.selectedElement = null
+    if (this.selectedElement) {
+      this.deleteElement(this.selectedElement)
+    } else {
+      this.showConfirm(() => {
+        this.ctx.fillStyle = "#000000"
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
+        this.elementsLayer.innerHTML = ""
+        this.selectedElement = null
+      })
     }
   }
 
   // Toggle toolbar
   toggleToolbar() {
+    if (!this.toolbar) return
     this.toolbar.classList.toggle("hidden")
   }
 
@@ -495,7 +608,434 @@ addImage(e) {
   }
 }
 
-// Inicializar aplicación
+// Inicializar aplicación + teclado en pantalla
 document.addEventListener("DOMContentLoaded", () => {
-  new DrawingBoard()
-})
+  const board = new DrawingBoard()
+  window.__drawingBoardInstance = board
+
+  // On-screen keyboard script
+  // Elements
+  const keyboardToggle = document.getElementById("keyboardToggle");
+  const keyboard = document.getElementById("onScreenKeyboard");
+  const keyboardRows = document.getElementById("keyboardRows");
+  const keyboardClose = document.getElementById("keyboardClose");
+  const kbdShiftBtn = document.getElementById("kbdShift");
+  const kbdSpace = document.getElementById("kbdSpace");
+  const kbdEnter = document.getElementById("kbdEnter");
+  const kbdBack = document.getElementById("kbdBack");
+  const kbdDragHandle = document.getElementById("kbdDragHandle");
+
+  // State
+  let shiftActive = false;
+  let focusedEditable = null; // element that receives typed chars
+
+  //  Exponer focusedEditable globalmente para sincronización
+  window.__keyboardFocusedEditable = focusedEditable;
+
+  // Layout: rows (letters, numbers, special chars)
+  const rows = [
+    "1 2 3 4 5 6 7 8 9 0".split(" "),
+    "q w e r t y u i o p".split(" "),
+    "a s d f g h j k l ñ".split(" "),
+    "z x c v b n m , .".split(" "),
+    "# $ % * ^ ! [ ]".split(" "), // special row
+  ];
+
+  // Add letters uppercase when shift active
+  function renderKeyboard() {
+    if (!keyboardRows) return;
+    keyboardRows.innerHTML = "";
+    rows.forEach((row) => {
+      const r = document.createElement("div");
+      r.className = "k-row";
+      row.forEach((key) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "key";
+        btn.dataset.key = key;
+        btn.textContent = displayForKey(key);
+        btn.addEventListener("click", onKeyClick);
+        r.appendChild(btn);
+      });
+      keyboardRows.appendChild(r);
+    });
+  }
+
+  function displayForKey(k) {
+    if (k.length === 1 && /[a-zñ]/i.test(k)) {
+      return shiftActive ? k.toUpperCase() : k.toLowerCase();
+    }
+    return k;
+  }
+
+  // Insert character into focused editable
+  function insertChar(char) {
+    //  Usar la referencia global sincronizada
+    focusedEditable = window.__keyboardFocusedEditable;
+
+    if (!focusedEditable) {
+      // If no focused editable, try detect current selection target:
+      const active = document.activeElement;
+      if (isEditable(active)) {
+        focusedEditable = active;
+        window.__keyboardFocusedEditable = active;
+      }
+    }
+    if (!focusedEditable) {
+      // If still none, create a new text element at center (compatible with your canvas)
+      createAndFocusTextAtCenter(char);
+      return;
+    }
+    if (focusedEditable.isContentEditable) {
+      insertTextIntoContentEditable(focusedEditable, char);
+    } else {
+      // fallback: append textContent
+      focusedEditable.textContent = (focusedEditable.textContent || "") + char;
+    }
+  }
+
+  // Función para insertar texto en contentEditable - CORREGIDA
+  function insertTextIntoContentEditable(el, text) {
+    el.focus();
+
+    const sel = window.getSelection();
+
+    // Si no hay rango, crear uno al final
+    if (!sel.rangeCount) {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false); // colapsar al final
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    const range = sel.getRangeAt(0);
+
+    if (text === "\n") {
+      // Crear un salto de línea
+      const br = document.createElement("br");
+      range.deleteContents();
+      range.insertNode(br);
+
+      // Mover cursor después del <br>
+      range.setStartAfter(br);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } else {
+      // Insertar texto normal
+      const textNode = document.createTextNode(text);
+      range.deleteContents(); // eliminar selección si la hay
+      range.insertNode(textNode);
+
+      // Mover cursor después del texto insertado
+      range.setStartAfter(textNode);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }
+
+  function placeCursorAtEnd(el) {
+    const range = document.createRange();
+    const sel = window.getSelection();
+
+    // Si el elemento tiene contenido
+    if (el.childNodes.length > 0) {
+      const lastChild = el.childNodes[el.childNodes.length - 1];
+      if (lastChild.nodeType === Node.TEXT_NODE) {
+        range.setStart(lastChild, lastChild.textContent.length);
+      } else {
+        range.setStartAfter(lastChild);
+      }
+    } else {
+      // Si no tiene contenido, colocar al inicio
+      range.setStart(el, 0);
+    }
+
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  // Create new text element compatible with your project and focus it
+  function createAndFocusTextAtCenter(initialChar = "") {
+    const elementsLayer = document.getElementById("elementsLayer");
+    if (!elementsLayer) return;
+    const rect = { x: window.innerWidth / 2 - 100, y: window.innerHeight / 2 - 20 };
+    const textElement = document.createElement("div");
+    textElement.className = "text-element";
+    textElement.contentEditable = true;
+    textElement.spellcheck = false;
+    textElement.textContent = initialChar || "Texto";
+    textElement.style.left = rect.x + "px";
+    textElement.style.top = rect.y + "px";
+    textElement.style.color = "#ffffff";
+    textElement.style.fontSize = "20px";
+    elementsLayer.appendChild(textElement);
+    // Integrate with existing interactivity if your app exposes it.
+    try {
+      const boardInstance = window.__drawingBoardInstance;
+      if (boardInstance && typeof boardInstance.makeElementInteractive === "function") {
+        boardInstance.makeElementInteractive(textElement);
+        boardInstance.selectElement(textElement);
+      } else {
+        setTimeout(() => {
+          textElement.focus();
+          placeCursorAtEnd(textElement);
+        }, 10);
+      }
+      focusedEditable = textElement;
+      window.__keyboardFocusedEditable = textElement; //  Sincronizar
+    } catch (err) {
+      setTimeout(() => {
+        textElement.focus();
+        placeCursorAtEnd(textElement);
+      }, 10);
+      focusedEditable = textElement;
+      window.__keyboardFocusedEditable = textElement; //  Sincronizar
+    }
+  }
+
+  // Backspace behavior
+  function performBackspace() {
+    focusedEditable = window.__keyboardFocusedEditable;
+
+    if (!focusedEditable) return;
+
+    if (focusedEditable.isContentEditable) {
+      focusedEditable.focus();
+
+      const sel = window.getSelection();
+      if (!sel.rangeCount) {
+        // Si no hay selección, crear una al final
+        placeCursorAtEnd(focusedEditable);
+        return;
+      }
+
+      const range = sel.getRangeAt(0);
+
+      // Si hay selección de texto, eliminarla
+      if (!range.collapsed) {
+        range.deleteContents();
+        return;
+      }
+
+      // Obtener la posición actual del cursor
+      const startContainer = range.startContainer;
+      const startOffset = range.startOffset;
+
+      // Caso 1: Estamos en un nodo de texto
+      if (startContainer.nodeType === Node.TEXT_NODE) {
+        if (startOffset > 0) {
+          // Eliminar un caracter hacia atrás en el mismo nodo
+          const textContent = startContainer.textContent;
+          startContainer.textContent = textContent.slice(0, startOffset - 1) + textContent.slice(startOffset);
+
+          // Actualizar posición del cursor
+          range.setStart(startContainer, startOffset - 1);
+          range.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(range);
+          return;
+        } else {
+          // Estamos al inicio del nodo de texto, buscar nodo anterior
+          const prevNode = getPreviousTextNode(startContainer, focusedEditable);
+          if (prevNode) {
+            const prevLength = prevNode.textContent.length;
+            if (prevLength > 0) {
+              // Eliminar último caracter del nodo anterior
+              prevNode.textContent = prevNode.textContent.slice(0, -1);
+
+              // Mover cursor al final del nodo anterior
+              range.setStart(prevNode, prevNode.textContent.length);
+              range.collapse(true);
+              sel.removeAllRanges();
+              sel.addRange(range);
+              return;
+            }
+          }
+        }
+      }
+
+      // Caso 2: Estamos en un elemento
+      else if (startContainer.nodeType === Node.ELEMENT_NODE) {
+        if (startOffset > 0) {
+          const prevChild = startContainer.childNodes[startOffset - 1];
+
+          // Si es un <br>, eliminarlo
+          if (prevChild && prevChild.tagName === "BR") {
+            prevChild.remove();
+            return;
+          }
+
+          // Si es un nodo de texto, eliminar su último caracter
+          if (prevChild && prevChild.nodeType === Node.TEXT_NODE) {
+            const textContent = prevChild.textContent;
+            if (textContent.length > 0) {
+              prevChild.textContent = textContent.slice(0, -1);
+
+              // Mover cursor al final de ese nodo
+              range.setStart(prevChild, prevChild.textContent.length);
+              range.collapse(true);
+              sel.removeAllRanges();
+              sel.addRange(range);
+              return;
+            }
+          }
+        }
+      }
+
+      // Fallback: si nada funcionó y hay contenido, usar textContent
+      const content = focusedEditable.textContent || "";
+      if (content.length > 0) {
+        // Solo como último recurso
+        const newContent = content.slice(0, -1);
+        focusedEditable.textContent = newContent;
+        placeCursorAtEnd(focusedEditable);
+      }
+    }
+  }
+
+  function getPreviousTextNode(node, rootElement) {
+    let current = node;
+
+    // Subir en el árbol hasta encontrar un nodo con hermano anterior
+    while (current && current !== rootElement) {
+      if (current.previousSibling) {
+        current = current.previousSibling;
+
+        // Bajar al nodo más profundo a la derecha
+        while (current.lastChild) {
+          current = current.lastChild;
+        }
+
+        // Si es un nodo de texto, lo encontramos
+        if (current.nodeType === Node.TEXT_NODE) {
+          return current;
+        }
+      } else {
+        current = current.parentNode;
+      }
+    }
+
+    return null;
+  }
+
+  // Enter behavior
+  function performEnter() {
+    insertChar("\n");
+  }
+
+  // Space
+  function performSpace() {
+    insertChar(" ");
+  }
+
+  // Helper: check if element is editable
+  function isEditable(el) {
+    if (!el) return false;
+    return el.isContentEditable;
+  }
+
+  // Key click handler
+  function onKeyClick(e) {
+    const key = e.currentTarget.dataset.key;
+    if (!key) return;
+    let charToInsert = displayForKey(key);
+    if (/^\d+$/.test(key)) {
+      charToInsert = key;
+    }
+    insertChar(charToInsert);
+  }
+
+  // Footer buttons
+  if (kbdShiftBtn) {
+    kbdShiftBtn.addEventListener("click", () => {
+      shiftActive = !shiftActive;
+      kbdShiftBtn.classList.toggle("active", shiftActive);
+      renderKeyboard();
+    });
+  }
+  if (kbdSpace) kbdSpace.addEventListener("click", performSpace);
+  if (kbdEnter) kbdEnter.addEventListener("click", performEnter);
+  if (kbdBack) kbdBack.addEventListener("click", performBackspace);
+
+  // Toggle keyboard visibility
+  if (keyboardToggle) {
+    keyboardToggle.addEventListener("click", () => {
+      if (!keyboard) return;
+      keyboard.classList.toggle("hidden");
+      keyboard.setAttribute("aria-hidden", keyboard.classList.contains("hidden") ? "true" : "false");
+    });
+  }
+  if (keyboardClose) keyboardClose.addEventListener("click", () => {
+    //  Usar el método de la instancia de DrawingBoard para cerrar manualmente
+    const boardInstance = window.__drawingBoardInstance;
+    if (boardInstance && typeof boardInstance.closeKeyboardManually === "function") {
+      boardInstance.closeKeyboardManually();
+    } else {
+      // Fallback si no hay instancia
+      keyboard.classList.add("hidden");
+      keyboard.style.display = "none";
+    }
+  });
+
+  // Track focus on content editable or inputs so keyboard types there
+  document.addEventListener("focusin", (ev) => {
+    const tgt = ev.target;
+    if (isEditable(tgt)) {
+      focusedEditable = tgt;
+      window.__keyboardFocusedEditable = tgt; //  Sincronizar
+    }
+  });
+
+  document.addEventListener("click", (ev) => {
+    const tgt = ev.target;
+    //  Limpiar focusedEditable solo si hacemos click fuera de elementos editables Y teclado
+    if (!isEditable(tgt) && !tgt.closest(".keyboard") && !tgt.closest(".text-element")) {
+      focusedEditable = null;
+      window.__keyboardFocusedEditable = null; //  Sincronizar
+    }
+  });
+
+  // Make keyboard draggable via header handle
+  (function makeDraggable() {
+    if (!kbdDragHandle || !keyboard) return;
+    let dragging = false;
+    let offsetX = 0, offsetY = 0;
+    kbdDragHandle.addEventListener("mousedown", (e) => {
+      dragging = true;
+      const rect = keyboard.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+      keyboard.style.transition = "none";
+      document.body.style.userSelect = "none";
+    });
+    document.addEventListener("mousemove", (e) => {
+      if (!dragging) return;
+      let x = e.clientX - offsetX;
+      let y = e.clientY - offsetY;
+      x = Math.max(8, Math.min(window.innerWidth - keyboard.offsetWidth - 8, x));
+      y = Math.max(8, Math.min(window.innerHeight - keyboard.offsetHeight - 8, y));
+      keyboard.style.left = x + "px";
+      keyboard.style.top = y + "px";
+      keyboard.style.right = "auto";
+      keyboard.style.bottom = "auto";
+      keyboard.style.position = "fixed";
+    });
+    document.addEventListener("mouseup", () => {
+      if (dragging) {
+        dragging = false;
+        document.body.style.userSelect = "";
+        keyboard.style.transition = "";
+      }
+    });
+  })();
+
+  // Inicializar
+  renderKeyboard();
+
+  // Expose reference note (ya expuesto arriba)
+  // window.__drawingBoardInstance = board; // ya seteado
+});

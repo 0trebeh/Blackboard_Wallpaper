@@ -233,6 +233,163 @@ body {
   cursor: text !important;
 }
 
+/* On-screen keyboard styles (fits your existing theme) */
+.keyboard {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 720px;
+  max-width: calc(100vw - 48px);
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 10px;
+  z-index: 1500;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+  color: white;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: inherit;
+}
+
+/* Hidden helper */
+.keyboard.hidden {
+  display: none;
+}
+
+/* Header */
+.keyboard-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  padding: 2px 6px;
+  font-size: 13px;
+  color: #eaeaea;
+}
+
+.keyboard-controls {
+  display:flex;
+  gap:6px;
+}
+
+.mini-handle {
+  background: rgba(255,255,255,0.06);
+  border:none;
+  color: white;
+  width:28px;
+  height:28px;
+  border-radius:6px;
+  cursor: pointer;
+  font-size:12px;
+}
+
+/* Keys container */
+.keyboard-rows {
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+/* A row of keys */
+.k-row {
+  display:flex;
+  gap:6px;
+  justify-content:center;
+  flex-wrap:nowrap;
+}
+
+/* Single key */
+.key {
+  background: rgba(255,255,255,0.06);
+  border: none;
+  color: white;
+  padding: 10px 12px;
+  border-radius: 8px;
+  min-width: 42px;
+  text-align:center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: transform .08s ease, background .12s ease;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.4) inset;
+}
+
+/* Hover and active */
+.key:hover { transform: translateY(-3px); background: rgba(255,255,255,0.12); }
+.key:active { transform: translateY(0); }
+
+/* Wide keys (space) */
+.key.wide { min-width: 220px; flex: 1; }
+
+/* Special keys */
+.key.special {
+  background: rgba(255,255,255,0.09);
+  font-weight: 600;
+}
+
+/* Toggle state (shift active) */
+.key.active {
+  background: rgba(255,255,255,0.22);
+  box-shadow: 0 0 18px rgba(255,255,255,0.08);
+}
+
+/* Footer controls row */
+.keyboard-footer {
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  align-items:center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .keyboard { width: calc(100vw - 24px); right: 12px; left: 12px; bottom: 12px; }
+  .key { min-width: 34px; padding: 8px 8px; font-size: 14px; }
+  .key.wide { min-width: 140px; }
+}
+
+/*Custom Modal*/
+.confirm-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.confirm-modal.hidden {
+  display: none;
+}
+.confirm-box {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+.confirm-btn{
+  padding-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+}
+.confirm-box button {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px;
+  border: none;
+  color: white;
+  font-size: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
 /* Animaciones */
 @keyframes fadeIn {
   from {
