@@ -1,5 +1,5 @@
 /* =========================================================
-   Pizarra — fondo de pantalla interactivo
+   Blackboard — interactive wallpaper
    ========================================================= */
 
 :root {
@@ -63,7 +63,7 @@ svg .f {
   display: none !important;
 }
 
-/* ---------- Capas ---------- */
+/* ---------- Layers ---------- */
 
 #bg,
 #grid,
@@ -141,7 +141,7 @@ body.textured #texture {
   z-index: 4;
 }
 
-/* Cursores por herramienta */
+/* Cursors per tool */
 body.tool-chalk #ink,
 body.tool-marker #ink,
 body.tool-highlighter #ink,
@@ -161,7 +161,7 @@ body.tool-note #ink {
   cursor: copy;
 }
 
-/* En modo selección el lienzo deja pasar los clics a los objetos */
+/* In select mode the canvas lets clicks through to the objects */
 body.tool-select #ink,
 body.tool-lock #ink {
   pointer-events: none;
@@ -195,7 +195,7 @@ body.tool-lock .obj {
   border-style: dashed;
 }
 
-/* ---------- Objetos ---------- */
+/* ---------- Objects ---------- */
 
 .obj {
   position: absolute;
@@ -290,7 +290,7 @@ body.tool-select .obj {
   to { opacity: 1; }
 }
 
-/* ---------- Paneles ---------- */
+/* ---------- Panels ---------- */
 
 .panel {
   background: var(--ui-bg);
@@ -365,7 +365,7 @@ body.tool-select .obj {
   border-bottom-color: var(--ui-dim);
 }
 
-/* ---------- Barra de herramientas ---------- */
+/* ---------- Toolbar ---------- */
 
 #toolbar {
   position: fixed;
@@ -510,7 +510,7 @@ body.tool-select .obj {
   color: var(--ui-dim);
 }
 
-/* ---------- Menús flotantes ---------- */
+/* ---------- Popovers ---------- */
 
 .popover {
   position: fixed;
@@ -732,7 +732,7 @@ input[type="range"]::-webkit-slider-thumb {
   transform: translateX(16px);
 }
 
-/* ---------- Barra contextual ---------- */
+/* ---------- Context bar ---------- */
 
 #contextBar {
   position: fixed;
@@ -753,7 +753,7 @@ input[type="range"]::-webkit-slider-thumb {
   height: 18px;
 }
 
-/* ---------- Teclado en pantalla ---------- */
+/* ---------- On-screen keyboard ---------- */
 
 #keyboard {
   position: fixed;
@@ -863,7 +863,7 @@ input[type="range"]::-webkit-slider-thumb {
   color: var(--accent);
 }
 
-/* ---------- Diálogo y aviso ---------- */
+/* ---------- Dialog and toast ---------- */
 
 .modal {
   position: fixed;
@@ -931,7 +931,7 @@ input[type="range"]::-webkit-slider-thumb {
   font-weight: 600;
 }
 
-/* Fondos claros: la interfaz sigue oscura, solo ajustamos detalles */
+/* Light backgrounds: the UI stays dark, only small tweaks */
 body.light #brushCursor {
   border-color: rgba(0, 0, 0, 0.7);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6);

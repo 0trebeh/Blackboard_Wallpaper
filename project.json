@@ -1,6 +1,6 @@
 {
 	"contentrating": "Everyone",
-	"description": "Pizarra interactiva como fondo de pantalla: tiza, rotulador, resaltador, formas, textos, notas adhesivas e imágenes. Varias páginas, deshacer/rehacer, teclado en pantalla y guardado automático.",
+	"description": "Interactive blackboard wallpaper: chalk, marker, highlighter, shapes, text, sticky notes and images. Multiple pages, undo/redo, on-screen keyboard and auto-save.",
 	"file": "index.html",
 	"general": {
 		"properties": {

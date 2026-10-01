@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pizarra</title>
+  <title>Blackboard</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <body class="tool-chalk">
-  <!-- ===== Iconos (sprite SVG) ===== -->
+  <!-- ===== Icons (SVG sprite) ===== -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
       <symbol id="i-select" viewBox="0 0 24 24"><path d="M5 3.5l13 6.2-5.6 1.9-2.2 5.9z" /><path d="M12.6 11.6l5 5" /></symbol>
@@ -47,7 +47,7 @@
     </defs>
   </svg>
 
-  <!-- ===== Capas de la pizarra ===== -->
+  <!-- ===== Board layers ===== -->
   <div id="bg"></div>
   <div id="grid"></div>
   <div id="texture"></div>
@@ -57,30 +57,30 @@
   <div id="textLayer" class="layer"></div>
   <div id="brushCursor"></div>
 
-  <!-- ===== Barra contextual del elemento seleccionado ===== -->
+  <!-- ===== Context bar for the selected item ===== -->
   <div id="contextBar" class="panel hidden">
-    <button class="btn" data-ctx="edit" title="Editar texto"><svg><use href="#i-edit" /></svg></button>
-    <button class="btn" data-ctx="color" title="Aplicar color actual"><svg><use href="#i-drop" /></svg></button>
-    <button class="btn" data-ctx="duplicate" title="Duplicar"><svg><use href="#i-copy" /></svg></button>
-    <button class="btn" data-ctx="front" title="Traer al frente"><svg><use href="#i-front" /></svg></button>
-    <button class="btn danger" data-ctx="delete" title="Eliminar (Supr)"><svg><use href="#i-trash" /></svg></button>
+    <button class="btn" data-ctx="edit" title="Edit text"><svg><use href="#i-edit" /></svg></button>
+    <button class="btn" data-ctx="color" title="Apply current color"><svg><use href="#i-drop" /></svg></button>
+    <button class="btn" data-ctx="duplicate" title="Duplicate"><svg><use href="#i-copy" /></svg></button>
+    <button class="btn" data-ctx="front" title="Bring to front"><svg><use href="#i-front" /></svg></button>
+    <button class="btn danger" data-ctx="delete" title="Delete (Del)"><svg><use href="#i-trash" /></svg></button>
   </div>
 
-  <!-- ===== Barra de herramientas ===== -->
+  <!-- ===== Toolbar ===== -->
   <div id="toolbar" class="panel">
-    <div class="grip" id="toolbarGrip" title="Arrastrar barra"><svg><use href="#i-grip" /></svg></div>
+    <div class="grip" id="toolbarGrip" title="Drag toolbar"><svg><use href="#i-grip" /></svg></div>
 
     <div class="tb-body">
       <div class="group">
-        <button class="btn" data-tool="select" title="Seleccionar y mover (V)"><svg><use href="#i-select" /></svg></button>
-        <button class="btn" data-tool="chalk" title="Tiza (B)"><svg><use href="#i-chalk" /></svg></button>
-        <button class="btn" data-tool="marker" title="Rotulador (M)"><svg><use href="#i-marker" /></svg></button>
-        <button class="btn" data-tool="highlighter" title="Resaltador (H)"><svg><use href="#i-highlighter" /></svg></button>
-        <button class="btn" data-tool="eraser" title="Borrador (E)"><svg><use href="#i-eraser" /></svg></button>
-        <button class="btn has-menu" data-tool="shape" id="shapeBtn" title="Formas (S)"><svg><use href="#i-rect" id="shapeIcon" /></svg></button>
-        <button class="btn" data-tool="text" title="Texto (T)"><svg><use href="#i-text" /></svg></button>
-        <button class="btn" data-tool="note" title="Nota adhesiva (N)"><svg><use href="#i-note" /></svg></button>
-        <label class="btn" title="Insertar imagen">
+        <button class="btn" data-tool="select" title="Select and move (V)"><svg><use href="#i-select" /></svg></button>
+        <button class="btn" data-tool="chalk" title="Chalk (B)"><svg><use href="#i-chalk" /></svg></button>
+        <button class="btn" data-tool="marker" title="Marker (M)"><svg><use href="#i-marker" /></svg></button>
+        <button class="btn" data-tool="highlighter" title="Highlighter (H)"><svg><use href="#i-highlighter" /></svg></button>
+        <button class="btn" data-tool="eraser" title="Eraser (E)"><svg><use href="#i-eraser" /></svg></button>
+        <button class="btn has-menu" data-tool="shape" id="shapeBtn" title="Shapes (S)"><svg><use href="#i-rect" id="shapeIcon" /></svg></button>
+        <button class="btn" data-tool="text" title="Text (T)"><svg><use href="#i-text" /></svg></button>
+        <button class="btn" data-tool="note" title="Sticky note (N)"><svg><use href="#i-note" /></svg></button>
+        <label class="btn" title="Insert image">
           <svg><use href="#i-image" /></svg>
           <input type="file" id="imageInput" accept="image/*" hidden>
         </label>
@@ -89,41 +89,41 @@
       <div class="sep"></div>
 
       <div class="group swatches" id="swatches"></div>
-      <button class="btn size-btn" id="sizeBtn" title="Grosor"><span class="size-dot" id="sizeDot"></span></button>
+      <button class="btn size-btn" id="sizeBtn" title="Size"><span class="size-dot" id="sizeDot"></span></button>
 
       <div class="sep"></div>
 
       <div class="group">
-        <button class="btn" id="undoBtn" title="Deshacer (Ctrl+Z)"><svg><use href="#i-undo" /></svg></button>
-        <button class="btn" id="redoBtn" title="Rehacer (Ctrl+Y)"><svg><use href="#i-redo" /></svg></button>
-        <button class="btn" id="clearBtn" title="Limpiar página"><svg><use href="#i-broom" /></svg></button>
+        <button class="btn" id="undoBtn" title="Undo (Ctrl+Z)"><svg><use href="#i-undo" /></svg></button>
+        <button class="btn" id="redoBtn" title="Redo (Ctrl+Y)"><svg><use href="#i-redo" /></svg></button>
+        <button class="btn" id="clearBtn" title="Clear page"><svg><use href="#i-broom" /></svg></button>
       </div>
 
       <div class="sep"></div>
 
       <div class="group pages">
-        <button class="btn sm" id="prevPage" title="Página anterior"><svg><use href="#i-left" /></svg></button>
-        <button class="page-label" id="pageLabel" title="Páginas">1 / 1</button>
-        <button class="btn sm" id="nextPage" title="Página siguiente"><svg><use href="#i-right" /></svg></button>
+        <button class="btn sm" id="prevPage" title="Previous page"><svg><use href="#i-left" /></svg></button>
+        <button class="page-label" id="pageLabel" title="Pages">1 / 1</button>
+        <button class="btn sm" id="nextPage" title="Next page"><svg><use href="#i-right" /></svg></button>
       </div>
 
       <div class="sep"></div>
 
       <div class="group">
-        <button class="btn" id="settingsBtn" title="Fondo y ajustes"><svg><use href="#i-sliders" /></svg></button>
-        <button class="btn" data-tool="lock" title="Bloquear pizarra (no reacciona a clics)"><svg><use href="#i-lock" /></svg></button>
+        <button class="btn" id="settingsBtn" title="Background and settings"><svg><use href="#i-sliders" /></svg></button>
+        <button class="btn" data-tool="lock" title="Lock board (ignore clicks)"><svg><use href="#i-lock" /></svg></button>
       </div>
     </div>
 
-    <button class="btn collapse-btn" id="collapseBtn" title="Contraer barra"><svg><use href="#i-minus" /></svg></button>
+    <button class="btn collapse-btn" id="collapseBtn" title="Collapse toolbar"><svg><use href="#i-minus" /></svg></button>
   </div>
 
-  <!-- ===== Menús flotantes ===== -->
+  <!-- ===== Popovers ===== -->
   <div id="shapeMenu" class="panel popover hidden">
-    <button class="btn" data-shape="line" title="Línea"><svg><use href="#i-line" /></svg></button>
-    <button class="btn" data-shape="arrow" title="Flecha"><svg><use href="#i-arrow" /></svg></button>
-    <button class="btn" data-shape="rect" title="Rectángulo"><svg><use href="#i-rect" /></svg></button>
-    <button class="btn" data-shape="ellipse" title="Elipse"><svg><use href="#i-ellipse" /></svg></button>
+    <button class="btn" data-shape="line" title="Line"><svg><use href="#i-line" /></svg></button>
+    <button class="btn" data-shape="arrow" title="Arrow"><svg><use href="#i-arrow" /></svg></button>
+    <button class="btn" data-shape="rect" title="Rectangle"><svg><use href="#i-rect" /></svg></button>
+    <button class="btn" data-shape="ellipse" title="Ellipse"><svg><use href="#i-ellipse" /></svg></button>
   </div>
 
   <div id="sizeMenu" class="panel popover hidden">
@@ -135,45 +135,45 @@
   </div>
 
   <div id="pageMenu" class="panel popover hidden">
-    <button class="menu-item" id="addPage"><svg><use href="#i-plus" /></svg>Nueva página</button>
-    <button class="menu-item danger" id="deletePage"><svg><use href="#i-trash" /></svg>Eliminar esta página</button>
+    <button class="menu-item" id="addPage"><svg><use href="#i-plus" /></svg>New page</button>
+    <button class="menu-item danger" id="deletePage"><svg><use href="#i-trash" /></svg>Delete this page</button>
   </div>
 
   <div id="settingsMenu" class="panel popover hidden">
-    <div class="set-title">Fondo</div>
+    <div class="set-title">Background</div>
     <div class="themes" id="themes"></div>
-    <div class="set-title">Guía</div>
+    <div class="set-title">Guide</div>
     <div class="seg" id="gridSeg">
-      <button data-grid="none">Nada</button>
-      <button data-grid="squares">Cuadros</button>
-      <button data-grid="dots">Puntos</button>
-      <button data-grid="lines">Renglones</button>
+      <button data-grid="none">None</button>
+      <button data-grid="squares">Grid</button>
+      <button data-grid="dots">Dots</button>
+      <button data-grid="lines">Lines</button>
     </div>
-    <div class="set-title">Letra de textos y notas</div>
+    <div class="set-title">Text and note font</div>
     <div class="seg" id="fontSeg"></div>
     <label class="switch-row">
-      <span>Textura de tiza en el fondo</span>
+      <span>Chalk texture on background</span>
       <input type="checkbox" id="textureToggle">
       <span class="switch"></span>
     </label>
   </div>
 
-  <!-- ===== Teclado en pantalla ===== -->
+  <!-- ===== On-screen keyboard ===== -->
   <div id="keyboard" class="panel hidden">
     <div class="kb-head" id="kbHead">
-      <span class="kb-title"><svg><use href="#i-keyboard" /></svg>Teclado</span>
-      <button class="kb-done" id="kbDone">Listo</button>
+      <span class="kb-title"><svg><use href="#i-keyboard" /></svg>Keyboard</span>
+      <button class="kb-done" id="kbDone">Done</button>
     </div>
     <div id="kbRows"></div>
   </div>
 
-  <!-- ===== Diálogo y avisos ===== -->
+  <!-- ===== Dialog and toast ===== -->
   <div id="confirm" class="modal hidden">
     <div class="panel modal-box">
-      <p id="confirmText">¿Seguro?</p>
+      <p id="confirmText">Are you sure?</p>
       <div class="modal-actions">
-        <button id="confirmCancel">Cancelar</button>
-        <button id="confirmOk" class="danger">Eliminar</button>
+        <button id="confirmCancel">Cancel</button>
+        <button id="confirmOk" class="danger">Delete</button>
       </div>
     </div>
   </div>

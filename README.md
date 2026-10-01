@@ -4,8 +4,6 @@
 
 A Windows wallpaper that works as a blackboard: draw with chalk, write notes, paste images and organize your ideas right on your desktop. Everything is saved automatically.
 
-> The app's interface is in Spanish. Button names are quoted below with their English meaning.
-
 ## Features
 
 - **Brushes**: textured chalk, marker, highlighter and eraser.
@@ -15,7 +13,7 @@ A Windows wallpaper that works as a blackboard: draw with chalk, write notes, pa
 - **Select**: move, resize, duplicate, bring to front, recolor and delete.
 - **Multiple pages**, each with its own undo and redo.
 - **Backgrounds**: green chalkboard, black, graphite, blue, whiteboard or a custom color, plus an optional grid, dot or ruled-line guide.
-- **On-screen keyboard** with uppercase, Spanish accents, ñ and symbols.
+- **On-screen keyboard** with uppercase, symbols, and accented letters (á, é, ñ…).
 - **Lock**: the board stops reacting to clicks.
 - **Auto-save**: drawings, text, images and settings are kept across restarts.
 
@@ -90,8 +88,8 @@ To have the shortcut available at startup, save the script and put a shortcut to
 | Chalk, marker, highlighter | Draw with the chosen color and size. |
 | Eraser | Erases strokes (not text, notes or images). |
 | Shapes | Click the button to choose line, arrow, rectangle or ellipse. |
-| Text and note | Click on the board to create one; click outside or press **"Listo"** (Done) to finish. |
-| Clear (broom) | Empties the page. Can be undone from the pop-up notice ("Deshacer" = Undo). |
+| Text and note | Click on the board to create one; click outside or press **Done** to finish. |
+| Clear (broom) | Empties the page. Can be undone from the pop-up notice (**Undo**). |
 | Pages | Arrows switch pages; click the page number to add or delete pages. |
 | Settings | Background, guide, font and texture. |
 | Lock | Locks the board so desktop clicks don't draw. |

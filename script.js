@@ -1,21 +1,19 @@
-"use strict"
-
 /* =========================================================
-   Pizarra — fondo de pantalla interactivo (Wallpaper Engine)
+   Blackboard — interactive wallpaper (Lively / Wallpaper Engine)
    ---------------------------------------------------------
-   Modelo: cada página guarda una lista ordenada de objetos.
-     stroke  → trazo de tiza / rotulador / resaltador / borrador
-     shape   → línea, flecha, rectángulo o elipse
-     text    → texto libre
-     note    → nota adhesiva
-     image   → imagen
-   Los trazos y formas se pintan en el canvas #ink (vectoriales,
-   así se pueden deshacer y se redibujan nítidos al cambiar de
-   resolución). Textos, notas e imágenes son elementos HTML.
-   Todo se guarda solo en IndexedDB (con localStorage de respaldo).
+   Model: each page holds an ordered list of objects.
+     stroke  → chalk / marker / highlighter / eraser stroke
+     shape   → line, arrow, rectangle or ellipse
+     text    → free text
+     note    → sticky note
+     image   → image
+   Strokes and shapes are painted on the #ink canvas (vector data,
+   so they can be undone and redrawn crisply when the resolution
+   changes). Text, notes and images are HTML elements.
+   Everything is saved automatically to IndexedDB (localStorage fallback).
    ========================================================= */
 
-/* ---------- Utilidades ---------- */
+/* ---------- Utilities ---------- */
 
 const $ = (s) => document.querySelector(s)
 const $$ = (s) => [...document.querySelectorAll(s)]
@@ -36,30 +34,30 @@ function luminance(hex) {
   return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
 }
 
-/* ---------- Constantes ---------- */
+/* ---------- Constants ---------- */
 
 const COLORS = ["#f4f1e8", "#ffe066", "#ffa94d", "#ff8fab", "#74c0fc", "#8ce99a", "#ff6b6b", "#1f1f1f"]
 
 const THEMES = [
-  { id: "verde", name: "Pizarra verde", color: "#26392f" },
-  { id: "negro", name: "Negro", color: "#0e0f10" },
-  { id: "grafito", name: "Grafito", color: "#2a2d31" },
-  { id: "azul", name: "Azul noche", color: "#1c2a3a" },
-  { id: "blanca", name: "Pizarra blanca", color: "#f1f0eb" },
+  { id: "verde", name: "Green chalkboard", color: "#26392f" },
+  { id: "negro", name: "Black", color: "#0e0f10" },
+  { id: "grafito", name: "Graphite", color: "#2a2d31" },
+  { id: "azul", name: "Night blue", color: "#1c2a3a" },
+  { id: "blanca", name: "Whiteboard", color: "#f1f0eb" },
 ]
 
 const FONTS = [
-  { id: "print", label: "Manuscrita", css: '"Segoe Print", "Ink Free", "Comic Sans MS", cursive' },
+  { id: "print", label: "Handwritten", css: '"Segoe Print", "Ink Free", "Comic Sans MS", cursive' },
   { id: "ink", label: "Ink Free", css: '"Ink Free", "Segoe Print", "Comic Sans MS", cursive' },
-  { id: "sans", label: "Normal", css: '"Segoe UI", system-ui, sans-serif' },
-  { id: "mono", label: "Código", css: 'Consolas, "Cascadia Mono", monospace' },
+  { id: "sans", label: "Regular", css: '"Segoe UI", system-ui, sans-serif' },
+  { id: "mono", label: "Code", css: 'Consolas, "Cascadia Mono", monospace' },
 ]
 
 const PEN_TOOLS = ["chalk", "marker", "highlighter", "eraser"]
 const SIZE_PRESETS = [2, 4, 8, 16, 32]
 const SHORTCUTS = { v: "select", b: "chalk", m: "marker", h: "highlighter", e: "eraser", s: "shape", t: "text", n: "note" }
 
-/* ---------- Estado ---------- */
+/* ---------- State ---------- */
 
 const newBoard = () => ({ id: uid(), objects: [] })
 
@@ -97,7 +95,7 @@ let S = defaultState()
 const board = () => S.boards[S.current]
 const findObj = (id) => board().objects.find((o) => o.id === id)
 
-/* ---------- Guardado ---------- */
+/* ---------- Saving ---------- */
 
 const Store = {
   db: null,
@@ -143,7 +141,7 @@ const Store = {
         tx.onerror = () => this.saveLocal(data)
         return
       } catch (e) {
-        /* sigue abajo */
+        /* fall through */
       }
     }
     this.saveLocal(data)
@@ -152,7 +150,7 @@ const Store = {
     try {
       localStorage.setItem("pizarra-state", JSON.stringify(data))
     } catch (e) {
-      toast("No se pudo guardar: el almacenamiento está lleno")
+      toast("Couldn't save: storage is full")
     }
   },
 }
@@ -167,7 +165,7 @@ function saveNow() {
   Store.save(S)
 }
 
-/* ---------- Historial (deshacer / rehacer por página) ---------- */
+/* ---------- History (undo / redo per page) ---------- */
 
 const histories = new Map()
 function hist() {
@@ -287,7 +285,7 @@ function renderInk() {
   }
 }
 
-/* Textura de tiza: un patrón de ruido teñido del color elegido */
+/* Chalk texture: a noise pattern tinted with the chosen color */
 const chalkCache = new Map()
 function chalkPattern(ctx, color) {
   let tile = chalkCache.get(color)
@@ -335,7 +333,7 @@ function applyInk(ctx, o) {
   }
 }
 
-/* Trazo suavizado con curvas por los puntos medios */
+/* Smoothed stroke using curves through midpoints */
 function tracePath(ctx, p) {
   const n = p.length / 2
   ctx.beginPath()
@@ -381,7 +379,7 @@ function drawObj(ctx, o) {
   ctx.restore()
 }
 
-/* ---------- Dibujo con puntero ---------- */
+/* ---------- Pointer drawing ---------- */
 
 let cur = null
 let liveQueued = false
@@ -482,7 +480,7 @@ ink.addEventListener("pointercancel", endStroke)
 ink.addEventListener("lostpointercapture", endStroke)
 ink.addEventListener("pointerleave", () => { if (!cur) brushCursor.style.display = "none" })
 
-/* Cursor circular que muestra el grosor */
+/* Round cursor showing the brush size */
 const brushCursor = $("#brushCursor")
 function moveBrushCursor(e) {
   if (!PEN_TOOLS.includes(S.tool)) return
@@ -497,7 +495,7 @@ function updateBrushCursor() {
   if (!PEN_TOOLS.includes(S.tool)) brushCursor.style.display = "none"
 }
 
-/* ---------- Objetos HTML (texto, notas, imágenes) ---------- */
+/* ---------- HTML objects (text, notes, images) ---------- */
 
 const imageLayer = $("#imageLayer")
 const textLayer = $("#textLayer")
@@ -561,7 +559,7 @@ function bindObj(el) {
     if (e.button !== 0) return
     const o = findObj(el.dataset.id) || (editing && editing.obj.id === el.dataset.id ? editing.obj : null)
     if (!o) return
-    if (el.classList.contains("editing")) return // dejar colocar el cursor de texto
+    if (el.classList.contains("editing")) return // let the user place the text caret
     e.preventDefault()
     e.stopPropagation()
     closePopovers()
@@ -602,7 +600,7 @@ function createNote(p) {
   startEditing(o, true)
 }
 
-/* Imágenes: se reducen a 1600 px para no llenar el almacenamiento */
+/* Images are scaled down to 1600 px so storage does not fill up */
 function readFile(file) {
   return new Promise((resolve, reject) => {
     const r = new FileReader()
@@ -650,7 +648,7 @@ async function addImageFile(file) {
     setTool("select")
     select(o.id)
   } catch (err) {
-    toast("No se pudo abrir la imagen")
+    toast("Couldn't open the image")
   }
 }
 
@@ -671,7 +669,7 @@ document.addEventListener("drop", (e) => {
   if (f) addImageFile(f)
 })
 
-/* ---------- Selección, mover y redimensionar ---------- */
+/* ---------- Selection, move and resize ---------- */
 
 let selected = null
 
@@ -797,7 +795,7 @@ function deleteObj(id) {
   record({ t: "remove", obj: o, index: i })
 }
 
-/* Barra contextual */
+/* Context bar */
 function placeContextBar() {
   const bar = $("#contextBar")
   const el = selected && els.get(selected)
@@ -871,7 +869,7 @@ function recolor(o, color) {
   if (inBoard) record({ t: "update", id: o.id, before, after: { [key]: value } })
 }
 
-/* ---------- Edición de texto ---------- */
+/* ---------- Text editing ---------- */
 
 let editing = null
 
@@ -944,7 +942,7 @@ function finishEditing() {
   }
 }
 
-/* ---------- Teclado en pantalla ---------- */
+/* ---------- On-screen keyboard ---------- */
 
 const LAYOUTS = {
   abc: [
@@ -970,7 +968,7 @@ function keyLabel(k) {
     case "SHIFT": return "⇧"
     case "BACK": return "⌫"
     case "ENTER": return "↵"
-    case "SPACE": return "espacio"
+    case "SPACE": return "space"
     case "MODE": return kb.layout === "abc" ? "?123 áé" : "abc"
   }
   return kb.shift || kb.caps ? k.toUpperCase() : k
@@ -1004,7 +1002,7 @@ function kbCommand(cmd, value) {
     placeCaretEnd(el)
   }
   if (document.execCommand(cmd, false, value)) return
-  // Respaldo por si execCommand no está disponible
+  // Fallback in case execCommand is unavailable
   const sel = getSelection()
   if (!sel.rangeCount) placeCaretEnd(el)
   const range = sel.getRangeAt(0)
@@ -1051,12 +1049,12 @@ function pressKey(k) {
 
 let repeatTimer = null
 keyboardEl.addEventListener("pointerdown", (e) => {
-  e.preventDefault() // no quitar el foco al texto
+  e.preventDefault() // keep focus on the text being edited
   const key = e.target.closest(".key")
   if (!key) return
   const k = key.dataset.key
   pressKey(k)
-  // Mantener pulsado ⌫ borra seguido (máx. ~6 s por seguridad)
+  // Holding ⌫ keeps deleting (max ~6 s as a safety stop)
   if (k === "BACK") {
     clearInterval(repeatTimer)
     let ticks = 0
@@ -1096,7 +1094,7 @@ makeDraggable($("#kbHead"), keyboardEl, (x, y) => {
   scheduleSave()
 }, (e) => e.target.closest("#kbDone"))
 
-/* ---------- Herramientas ---------- */
+/* ---------- Tools ---------- */
 
 function setTool(t) {
   if (t !== "text" && t !== "note") finishEditing()
@@ -1138,7 +1136,7 @@ function setShape(s) {
   scheduleSave()
 }
 
-/* Colores */
+/* Colors */
 function buildSwatches() {
   const box = $("#swatches")
   box.innerHTML = ""
@@ -1153,7 +1151,7 @@ function buildSwatches() {
   }
   const custom = document.createElement("label")
   custom.className = "swatch custom"
-  custom.title = "Otro color"
+  custom.title = "Custom color"
   custom.innerHTML = '<span class="inner"></span><input type="color" id="customColor">'
   box.appendChild(custom)
   custom.querySelector("input").addEventListener("input", (e) => setColor(e.target.value))
@@ -1175,7 +1173,7 @@ function setColor(c, apply = true) {
   scheduleSave()
 }
 
-/* Grosor */
+/* Size */
 function buildSizes() {
   const box = $("#sizePresets")
   for (const s of SIZE_PRESETS) {
@@ -1205,7 +1203,7 @@ function setSize(n) {
 
 $("#sizeBtn").addEventListener("click", (e) => togglePopover($("#sizeMenu"), e.currentTarget))
 
-/* Deshacer, limpiar */
+/* Undo, clear */
 $("#undoBtn").addEventListener("click", undo)
 $("#redoBtn").addEventListener("click", redo)
 $("#clearBtn").addEventListener("click", clearPage)
@@ -1218,10 +1216,10 @@ function clearPage() {
   record({ t: "clear", objects: b.objects.slice() })
   b.objects = []
   renderAll()
-  toast("Página limpiada", "Deshacer", undo)
+  toast("Page cleared", "Undo", undo)
 }
 
-/* ---------- Páginas ---------- */
+/* ---------- Pages ---------- */
 
 function goPage(i) {
   finishEditing()
@@ -1246,13 +1244,13 @@ $("#addPage").addEventListener("click", () => {
   closePopovers()
   S.boards.splice(S.current + 1, 0, newBoard())
   goPage(S.current + 1)
-  toast("Página " + (S.current + 1) + " creada")
+  toast("Page " + (S.current + 1) + " created")
 })
 
 $("#deletePage").addEventListener("click", () => {
   closePopovers()
   const single = S.boards.length === 1
-  const msg = single ? "¿Borrar todo el contenido de la página?" : "¿Eliminar la página " + (S.current + 1) + " y todo su contenido?"
+  const msg = single ? "Clear everything on this page?" : "Delete page " + (S.current + 1) + " and everything on it?"
   confirmBox(msg, () => {
     const b = board()
     histories.delete(b.id)
@@ -1267,7 +1265,7 @@ $("#deletePage").addEventListener("click", () => {
   })
 })
 
-/* ---------- Ajustes de fondo ---------- */
+/* ---------- Background settings ---------- */
 
 let textureKind = null
 function buildTexture(light) {
@@ -1340,7 +1338,7 @@ function buildSettings() {
   const custom = document.createElement("label")
   custom.className = "theme custom"
   custom.dataset.theme = "custom"
-  custom.title = "Color personalizado"
+  custom.title = "Custom color"
   custom.innerHTML = '<input type="color">'
   const input = custom.querySelector("input")
   input.value = S.settings.customBg
@@ -1366,7 +1364,7 @@ function buildSettings() {
 
 $("#settingsBtn").addEventListener("click", (e) => togglePopover($("#settingsMenu"), e.currentTarget))
 
-/* ---------- Menús flotantes ---------- */
+/* ---------- Popovers ---------- */
 
 function togglePopover(pop, anchor) {
   const wasOpen = !pop.classList.contains("hidden")
@@ -1388,14 +1386,14 @@ function closePopovers() {
 const POPOVER_ANCHORS = "#shapeBtn, #sizeBtn, #settingsBtn, #pageLabel"
 document.addEventListener("pointerdown", (e) => {
   if (!e.target.closest(".popover") && !e.target.closest(POPOVER_ANCHORS)) closePopovers()
-  // Clic en el fondo vacío (modo selección): soltar selección / edición
+  // Click on empty background (select mode): drop selection / editing
   if (e.target.id === "bg") {
     finishEditing()
     deselect()
   }
 }, true)
 
-/* Que los botones no roben el foco del texto que se está editando */
+/* Keep buttons from stealing focus from the text being edited */
 $("#toolbar").addEventListener("pointerdown", (e) => {
   if (e.target.closest(".btn, .swatch:not(.custom)")) e.preventDefault()
 })
@@ -1403,7 +1401,7 @@ $$(".popover").forEach((p) => p.addEventListener("pointerdown", (e) => {
   if (e.target.closest(".btn")) e.preventDefault()
 }))
 
-/* ---------- Barra de herramientas movible ---------- */
+/* ---------- Draggable toolbar ---------- */
 
 const toolbar = $("#toolbar")
 
@@ -1453,14 +1451,14 @@ function setCollapsed(c) {
   S.ui.collapsed = c
   toolbar.classList.toggle("collapsed", c)
   $("#collapseBtn use").setAttribute("href", c ? "#i-expand" : "#i-minus")
-  $("#collapseBtn").title = c ? "Mostrar barra" : "Contraer barra"
+  $("#collapseBtn").title = c ? "Expand toolbar" : "Collapse toolbar"
   closePopovers()
   placeToolbar()
   scheduleSave()
 }
 $("#collapseBtn").addEventListener("click", () => setCollapsed(!S.ui.collapsed))
 
-/* ---------- Aviso y confirmación ---------- */
+/* ---------- Toast and confirmation ---------- */
 
 let toastTimer = null
 function toast(msg, actionLabel, action) {
@@ -1490,7 +1488,7 @@ function confirmBox(text, onOk) {
   $("#confirmCancel").onclick = close
 }
 
-/* ---------- Atajos de teclado (si hay teclado físico) ---------- */
+/* ---------- Keyboard shortcuts (when a physical keyboard is available) ---------- */
 
 document.addEventListener("keydown", (e) => {
   if (editing) {
@@ -1522,7 +1520,7 @@ document.addEventListener("keydown", (e) => {
   }
 })
 
-/* ---------- Arranque ---------- */
+/* ---------- Startup ---------- */
 
 let resizeTimer = null
 window.addEventListener("resize", () => {
@@ -1558,7 +1556,7 @@ async function init() {
   setCollapsed(!!S.ui.collapsed)
   updatePages()
   updateUndoButtons()
-  // Acceso para depurar desde la consola (F12 en el navegador)
+  // Debug access from the console (F12 in a browser)
   window.__pizarra = { get state() { return S }, undo, redo, render: renderAll, save: saveNow }
 }
 
