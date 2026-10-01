@@ -2,78 +2,185 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pizarra de Dibujo</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pizarra</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 
-<body>
-    <!-- Canvas principal para dibujo -->
-    <canvas id="drawingCanvas"></canvas>
+<body class="tool-chalk">
+  <!-- ===== Iconos (sprite SVG) ===== -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-select" viewBox="0 0 24 24"><path d="M5 3.5l13 6.2-5.6 1.9-2.2 5.9z" /><path d="M12.6 11.6l5 5" /></symbol>
+      <symbol id="i-chalk" viewBox="0 0 24 24"><rect x="9.5" y="1.5" width="5.5" height="15" rx="1.6" transform="rotate(45 12.25 9)" /><path d="M3 21c1.6-.9 3.1.9 4.8 0s3.1.9 4.8 0" /></symbol>
+      <symbol id="i-marker" viewBox="0 0 24 24"><path d="M15.5 3.5l5 5L10 19H5v-5z" /><path d="M13 6l5 5" /><path d="M5 19l-2 2" /></symbol>
+      <symbol id="i-highlighter" viewBox="0 0 24 24"><path d="M9 11l-6 6v3h9l3-3" /><path d="M22 12l-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4" /></symbol>
+      <symbol id="i-eraser" viewBox="0 0 24 24"><path d="M7 21l-4.3-4.3a2.4 2.4 0 0 1 0-3.4l9.6-9.6a2.4 2.4 0 0 1 3.4 0l5.6 5.6a2.4 2.4 0 0 1 0 3.4L13 21" /><path d="M22 21H7" /><path d="M5 11l9 9" /></symbol>
+      <symbol id="i-shapes" viewBox="0 0 24 24"><rect x="3" y="3" width="10" height="10" rx="1.5" /><circle cx="15.5" cy="15.5" r="5.5" /></symbol>
+      <symbol id="i-line" viewBox="0 0 24 24"><path d="M5 19L19 5" /></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 19L19 5" /><path d="M10 5h9v9" /></symbol>
+      <symbol id="i-rect" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="1.5" /></symbol>
+      <symbol id="i-ellipse" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="7" /></symbol>
+      <symbol id="i-text" viewBox="0 0 24 24"><path d="M5 7V4.5h14V7" /><path d="M12 4.5v15" /><path d="M9 19.5h6" /></symbol>
+      <symbol id="i-note" viewBox="0 0 24 24"><path d="M4 4h16v10l-6 6H4z" /><path d="M14 20v-6h6" /></symbol>
+      <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8.5" cy="9.5" r="1.6" /><path d="M21 15.5l-5-5L6 20" /></symbol>
+      <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5" /><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" /></symbol>
+      <symbol id="i-redo" viewBox="0 0 24 24"><path d="M15 14l5-5-5-5" /><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13" /></symbol>
+      <symbol id="i-broom" viewBox="0 0 24 24"><path d="M13 11L21 3" /><path d="M9.2 9.3l5.5 5.5" /><path d="M9.2 9.3C6 9.5 3.5 12 3 21c9-.5 11.5-3 11.7-6.2" /><path d="M7 17l-1.6 1.6" /><path d="M10 18l-1 1.2" /></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16" /><path d="M9 7V4.5h6V7" /><path d="M6 7l1 13h10l1-13" /><path d="M10 11v5.5" /><path d="M14 11v5.5" /></symbol>
+      <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 6h9" /><path d="M19 6h1" /><circle cx="16" cy="6" r="2.4" /><path d="M4 12h2" /><path d="M12 12h8" /><circle cx="9" cy="12" r="2.4" /><path d="M4 18h11" /><path d="M20.5 18h-.5" /><circle cx="17.6" cy="18" r="2.4" /></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></symbol>
+      <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 7.6-1.7" /></symbol>
+      <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" /></symbol>
+      <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" /></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14" /><path d="M5 12h14" /></symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" /></symbol>
+      <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5" /><path d="M20 9V4h-5" /><path d="M4 15v5h5" /><path d="M20 15v5h-5" /></symbol>
+      <symbol id="i-grip" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.3" class="f" /><circle cx="15" cy="6" r="1.3" class="f" /><circle cx="9" cy="12" r="1.3" class="f" /><circle cx="15" cy="12" r="1.3" class="f" /><circle cx="9" cy="18" r="1.3" class="f" /><circle cx="15" cy="18" r="1.3" class="f" /></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" /></symbol>
+      <symbol id="i-front" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z" /><path d="M3 13l9 5 9-5" /></symbol>
+      <symbol id="i-edit" viewBox="0 0 24 24"><path d="M16 3.5l4.5 4.5L8 20.5H3.5V16z" /></symbol>
+      <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z" /></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12" /><path d="M18 6L6 18" /></symbol>
+      <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="2" /><path d="M6.5 9.5h.01M10.5 9.5h.01M14.5 9.5h.01M18 9.5h.01M7.5 14.5h9" /></symbol>
+    </defs>
+  </svg>
 
-    <!-- Capa para elementos HTML (texto, imágenes) -->
-    <div id="elementsLayer"></div>
+  <!-- ===== Capas de la pizarra ===== -->
+  <div id="bg"></div>
+  <div id="grid"></div>
+  <div id="texture"></div>
+  <div id="imageLayer" class="layer"></div>
+  <canvas id="ink"></canvas>
+  <canvas id="live"></canvas>
+  <div id="textLayer" class="layer"></div>
+  <div id="brushCursor"></div>
 
-    <!-- Botón para mostrar/ocultar toolbar -->
-    <button id="toggleToolbar" class="toggle-btn">⋯</button>
+  <!-- ===== Barra contextual del elemento seleccionado ===== -->
+  <div id="contextBar" class="panel hidden">
+    <button class="btn" data-ctx="edit" title="Editar texto"><svg><use href="#i-edit" /></svg></button>
+    <button class="btn" data-ctx="color" title="Aplicar color actual"><svg><use href="#i-drop" /></svg></button>
+    <button class="btn" data-ctx="duplicate" title="Duplicar"><svg><use href="#i-copy" /></svg></button>
+    <button class="btn" data-ctx="front" title="Traer al frente"><svg><use href="#i-front" /></svg></button>
+    <button class="btn danger" data-ctx="delete" title="Eliminar (Supr)"><svg><use href="#i-trash" /></svg></button>
+  </div>
 
-    <!-- Barra de herramientas flotante -->
-    <div id="toolbar" class="toolbar">
-        <button id="noneTool" class="tool-btn" data-tool="none" title="Sin acción">⛔</button>
-        <button id="pencilTool" class="tool-btn active" data-tool="pencil" title="Lápiz">✏️</button>
-        <button id="eraserTool" class="tool-btn" data-tool="eraser" title="Borrador">🧽</button>
+  <!-- ===== Barra de herramientas ===== -->
+  <div id="toolbar" class="panel">
+    <div class="grip" id="toolbarGrip" title="Arrastrar barra"><svg><use href="#i-grip" /></svg></div>
 
-        <div class="tool-group">
-            <label for="colorPicker" class="tool-btn" title="Color">🎨</label>
-            <input type="color" id="colorPicker" value="#ffffff">
-        </div>
+    <div class="tb-body">
+      <div class="group">
+        <button class="btn" data-tool="select" title="Seleccionar y mover (V)"><svg><use href="#i-select" /></svg></button>
+        <button class="btn" data-tool="chalk" title="Tiza (B)"><svg><use href="#i-chalk" /></svg></button>
+        <button class="btn" data-tool="marker" title="Rotulador (M)"><svg><use href="#i-marker" /></svg></button>
+        <button class="btn" data-tool="highlighter" title="Resaltador (H)"><svg><use href="#i-highlighter" /></svg></button>
+        <button class="btn" data-tool="eraser" title="Borrador (E)"><svg><use href="#i-eraser" /></svg></button>
+        <button class="btn has-menu" data-tool="shape" id="shapeBtn" title="Formas (S)"><svg><use href="#i-rect" id="shapeIcon" /></svg></button>
+        <button class="btn" data-tool="text" title="Texto (T)"><svg><use href="#i-text" /></svg></button>
+        <button class="btn" data-tool="note" title="Nota adhesiva (N)"><svg><use href="#i-note" /></svg></button>
+        <label class="btn" title="Insertar imagen">
+          <svg><use href="#i-image" /></svg>
+          <input type="file" id="imageInput" accept="image/*" hidden>
+        </label>
+      </div>
 
-        <div class="tool-group size-control">
-            <label class="tool-label">📏</label>
-            <input type="range" id="sizeSlider" min="1" max="150" value="5">
-            <input type="number" id="sizeInput" min="1" max="150" value="5">
-        </div>
+      <div class="sep"></div>
 
-        <button id="textTool" class="tool-btn" data-tool="text" title="Texto">📝</button>
+      <div class="group swatches" id="swatches"></div>
+      <button class="btn size-btn" id="sizeBtn" title="Grosor"><span class="size-dot" id="sizeDot"></span></button>
 
-        <div class="tool-group">
-            <label for="imageInput" class="tool-btn" title="Imagen">🖼️</label>
-            <input type="file" id="imageInput" accept="image/*" style="display: none;">
-        </div>
+      <div class="sep"></div>
 
-        <button id="clearCanvas" class="tool-btn" title="Limpiar Canvas">🧹</button>
-        <button id="resetAll" class="tool-btn" title="Reset Todo">🗑️</button>
+      <div class="group">
+        <button class="btn" id="undoBtn" title="Deshacer (Ctrl+Z)"><svg><use href="#i-undo" /></svg></button>
+        <button class="btn" id="redoBtn" title="Rehacer (Ctrl+Y)"><svg><use href="#i-redo" /></svg></button>
+        <button class="btn" id="clearBtn" title="Limpiar página"><svg><use href="#i-broom" /></svg></button>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="group pages">
+        <button class="btn sm" id="prevPage" title="Página anterior"><svg><use href="#i-left" /></svg></button>
+        <button class="page-label" id="pageLabel" title="Páginas">1 / 1</button>
+        <button class="btn sm" id="nextPage" title="Página siguiente"><svg><use href="#i-right" /></svg></button>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="group">
+        <button class="btn" id="settingsBtn" title="Fondo y ajustes"><svg><use href="#i-sliders" /></svg></button>
+        <button class="btn" data-tool="lock" title="Bloquear pizarra (no reacciona a clics)"><svg><use href="#i-lock" /></svg></button>
+      </div>
     </div>
 
-    <!-- On-screen keyboard -->
-    <div id="onScreenKeyboard" class="keyboard hidden" aria-hidden="true">
-        <div class="keyboard-header">
-            <button id="kbdDragHandle" class="mini-handle" title="Mover">↕</button>
-            <div class="keyboard-controls">
-                <button id="keyboardClose" class="mini-handle" title="Cerrar">✕</button>
-            </div>
-        </div>
-        <div class="keyboard-rows" id="keyboardRows"></div>
-        <div class="keyboard-footer">
-            <button id="kbdShift" class="key special">Shift</button>
-            <button id="kbdSpace" class="key wide">Espacio</button>
-            <button id="kbdEnter" class="key special">Enter</button>
-            <button id="kbdBack" class="key special">⌫</button>
-        </div>
-    </div>
+    <button class="btn collapse-btn" id="collapseBtn" title="Contraer barra"><svg><use href="#i-minus" /></svg></button>
+  </div>
 
-    <div id="confirmModal" class="confirm-modal hidden">
-        <div class="confirm-box">
-            <p>Confirmar</p>
-            <div class="confirm-btn">
-                <button id="confirmOk">OK</button>
-                <button id="confirmCancel">Cancelar</button>
-            </div>
-        </div>
-    </div>
+  <!-- ===== Menús flotantes ===== -->
+  <div id="shapeMenu" class="panel popover hidden">
+    <button class="btn" data-shape="line" title="Línea"><svg><use href="#i-line" /></svg></button>
+    <button class="btn" data-shape="arrow" title="Flecha"><svg><use href="#i-arrow" /></svg></button>
+    <button class="btn" data-shape="rect" title="Rectángulo"><svg><use href="#i-rect" /></svg></button>
+    <button class="btn" data-shape="ellipse" title="Elipse"><svg><use href="#i-ellipse" /></svg></button>
+  </div>
 
-    <script src="script.js"></script>
+  <div id="sizeMenu" class="panel popover hidden">
+    <div class="size-presets" id="sizePresets"></div>
+    <div class="size-row">
+      <input type="range" id="sizeSlider" min="1" max="80" value="6">
+      <span id="sizeValue">6</span>
+    </div>
+  </div>
+
+  <div id="pageMenu" class="panel popover hidden">
+    <button class="menu-item" id="addPage"><svg><use href="#i-plus" /></svg>Nueva página</button>
+    <button class="menu-item danger" id="deletePage"><svg><use href="#i-trash" /></svg>Eliminar esta página</button>
+  </div>
+
+  <div id="settingsMenu" class="panel popover hidden">
+    <div class="set-title">Fondo</div>
+    <div class="themes" id="themes"></div>
+    <div class="set-title">Guía</div>
+    <div class="seg" id="gridSeg">
+      <button data-grid="none">Nada</button>
+      <button data-grid="squares">Cuadros</button>
+      <button data-grid="dots">Puntos</button>
+      <button data-grid="lines">Renglones</button>
+    </div>
+    <div class="set-title">Letra de textos y notas</div>
+    <div class="seg" id="fontSeg"></div>
+    <label class="switch-row">
+      <span>Textura de tiza en el fondo</span>
+      <input type="checkbox" id="textureToggle">
+      <span class="switch"></span>
+    </label>
+  </div>
+
+  <!-- ===== Teclado en pantalla ===== -->
+  <div id="keyboard" class="panel hidden">
+    <div class="kb-head" id="kbHead">
+      <span class="kb-title"><svg><use href="#i-keyboard" /></svg>Teclado</span>
+      <button class="kb-done" id="kbDone">Listo</button>
+    </div>
+    <div id="kbRows"></div>
+  </div>
+
+  <!-- ===== Diálogo y avisos ===== -->
+  <div id="confirm" class="modal hidden">
+    <div class="panel modal-box">
+      <p id="confirmText">¿Seguro?</p>
+      <div class="modal-actions">
+        <button id="confirmCancel">Cancelar</button>
+        <button id="confirmOk" class="danger">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="panel hidden"><span id="toastText"></span><button id="toastAction"></button></div>
+
+  <script src="script.js"></script>
 </body>
 
 </html>
